@@ -1,0 +1,432 @@
+---
+title: "Myocard Porject"
+author: "Francielle Mina"
+date: "15/06/2021"
+output: pdf_document
+
+---
+
+Motivation 
+
+This project is a final assessment of the Data Science Professional Certificate. We were encouraged to find any dataset from UCI or Kaggel that we feel comfortable about it. For doing this, we are using the Myocardial infarction complications dataset from UCI repository machine learning. All the variables will explain along with the project. 
+
+1.0 Introduction 
+
+
+Until the last decade, world healthy has to change, including human behaviour and diseases. The actual world is fighting to prevent infections is the one possible strategy to deal with the increased hallmark of the current time. Prediction disease and chronic disease help the health system help to develop healthy ageing adults. Besides that, the "new world" already has to face many data generations, which can be suitable for data science. Data science has begun to provide a new set of tools that will leverage enhanced laboratory medicine and reinforce its value in a continuously transforming healthcare ecosystem (Gruson D, et al 2019). Using data science tools, it can work with a multidisciplinary field that uses scientific methods, process, algorithm and system to extracts insights from data (Peck, RW 2020). This current project is part of the Data Science Professional Certificate. To do this, we are applying techniques of data visualisation, exploration and linear regression and machine learning. According to this, we are using data from the ULC repository and predicted outcomes of myocardial infarction. We are going to see if the time of hospitalisation predicts new myocardial infarction. The time variable in this project counts how many time the patients were hospitalised. 
+
+Myocardial infarction (MI), commonly known as "heart attack", is irreversible damage caused by prolonged ischemia and hypoxia. That means the heart can receive so much blood (ischemia), or the heart doesn't have blood and oxygen (hypoxia). This a serious medical emergency, meaning the supply of blood to the heart is suddenly blocked, usually by a blood clot. Our heart constantly needs blood and oxygen for a healthy life. When the body stopped or increase the blood flux, can happen a heart attack or MI.
+
+In recent years MI has become one of the most severe diseases in several countries. Despite the treatment, some risk factors can predict MI, increasing the chances of first or second MI, such as age, hypertension, diabetes, and smoking (Fatemeh Kiani, 2016). With advanced medicine, it's easy to find blood tests for helping the diagnostic or prevention of MI. Different of levels enzymes can indicate how good the body and heart are. These enzymes, creatinine phosphokinase, serum creatinine, serum sodium and platelets, are usually inside the cells of your heart. When those cells or heart are injured, these enzymes spread out into your bloodstream. Measuring the levels of these enzymes is a good sign to know how the heart is. Following the World Health Organisation, 85% of deaths cardiovascular diseases caused by MI. It's essential to know to predict this disease to avoiding the patient's deaths. 
+
+
+2.0 Objective
+
+This current project is part final assessment Data Science Professional certificate. The main objective is to predict new outcomes of MI in a patient by time. The variable time is how many times the patient admitted to the University of Leicester hospitals. We are trying to predict if the time of hospitalisation and other health issues can predict new MI.
+
+
+3.0 Methods and Exploratory Data Analysis (EDA)
+
+For this project, we are using several packages from CRAN to assist our analysis. All the packages will be load along with the development of the project. First of all, we downloaded the dataset from the website and built a linear regression model. After that, split the data into train and test and built a model for machine learning.
+
+3.1 Explore dataset.
+
+First of all, explore and analyse the data set. It's essential to understand how the data are structured, characteristics for better knowledge.
+
+```{r}
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
+if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+if(!require(RColorBrewer)) install.packages("RColorBrewer", repos = "http://cran.us.r-project.org")
+if(!require(broom)) install.packages("broom", repos = "http://cran.us.r-project.org")
+
+library(tidyverse)
+library(dplyr)
+library(caret)
+library(broom)
+library(RColorBrewer)
+
+read_uci <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv")
+
+
+heart_disease <- read_uci
+```
+
+3.1.2 Analysing the Missing value 
+
+Dowloaded the dataset, we can analysing if there is missing values. 
+
+```{r}
+missing_value <- table(is.na(heart_disease))
+missing_value
+```
+
+We observe there is no missig_value on data set. 
+
+3.1.3 Exploratory Data Analysis (EDA)
+
+This data collected in patients from Jan 2000 to Jan 2020 at the hospital University of Edx, USA. All the patients have a previous diagnostic of MI and health issue. 
+
+```{r}
+class(heart_disease)
+```
+
+The class funtion tells us kind of R object we have. In our case class heart_disease is a data_frame.
+
+```{r}
+str(heart_disease)
+```
+
+The str function gives us the structure for the heart_disease dataset. Following this, we can notice the dataset has 299 obs and 13 variables. Also, we can observe the name of the variables on the dataset. 
+
+```{r}
+dim(heart_disease)
+```
+
+This function dim shows us how many rows and columns we have on dataset heart_disease. We can observe 299 rows and 13 variables. 
+
+```{r}
+head(heart_disease)
+```
+
+The function head shows us the top few rows or "head" of the dataset heart_disease. 
+
+Our project has the variable "sex", but we are assuming the 0 is woman and 1 for man. Following this, we can find the proportion for the "sex" in our case. 
+
+What's the proportion of women on dataset heart_disease? 
+```{r}
+mean(heart_disease$sex == 0)
+```
+We can observe around 0.3511706 or 35% of heart_disease is women. 
+ 
+ 
+ 
+What's the proportion of men on dataset heart_disease? 
+```{r}
+mean(heart_disease$sex == 1)
+```
+
+We can observe around 0.6488294 or 65% of heart_disease is men.
+
+
+3.2 EDA and Visualisation 
+
+In this part of the project, we use the mutate function for better visualisation and add a new variable with gender, male or female. 
+
+```{r}
+myocard <- heart_disease %>% mutate(gender = ifelse(sex > 0, "male", "female"))
+myocard
+```
+Following this, we can visualise that str, dim with new variable and mean for both genders doesn't affect by mutate function. 
+
+```{r}
+str(myocard)
+
+dim(myocard)
+
+mean(myocard$gender == "female")
+
+mean(myocard$gender == "male")
+```
+
+3.2.1 Distribution of Age 
+
+```{r}
+myocard %>% ggplot(aes(age, fill = gender)) + geom_histogram(bins = 30, binwidth = 5, color = "black") + xlab("Age") + ylab("Frequency of Age") + ggtitle("Distribution of Age by gender")
+```
+Age is one of most risk for developing predictions of diseases (Nicolli T, 2012). In our case, we can notice the distribution of age by gender. We see that the peak of age is around 60 and previous see before, and there is more man than a woman in our case. 
+
+3.2.2 Distribution of Diabetes 
+
+Diabetes is a common disease where your blood glucose is too high. That means your body doesn't produce enough insulin or can't produce any at all. The diagnostic of Diabetes can lead to several predictions of disease, such as MI.  In our case, we are assuming that all patients who have Diabetes are 1 and without Diabetes is 0. 
+
+```{r}
+myocard %>% ggplot(aes(diabetes)) + geom_bar(aes(fill = gender)) + scale_fill_brewer(palette="Blues") + 
+        xlab("Diabetes") + ylab("Frequency of Diabetes") + ggtitle("Distribution of Diabetes by gender")
+
+myocard %>% group_by(diabetes) %>% summarise(n = n()) %>% head()
+```
+
+We can visualise the number of patients who have Diabetes as around 125 and without Diabetes as 174.  
+
+
+3.2.3 Distribuition of Diabetes by gender 
+
+What's the proportion of Diabetes by gender? 
+
+```{r}
+myocard %>% group_by(gender) %>% summarise(diabetes = mean(diabetes == 0)) %>% 
+        filter(gender == "female") 
+
+myocard %>% group_by(gender) %>% summarise(diabetes = mean(diabetes == 1)) %>% 
+        filter(gender == "female") 
+
+myocard %>% group_by(gender) %>% summarise(diabetes = mean(diabetes == 0)) %>% 
+        filter(gender == "male") 
+
+myocard %>% group_by(gender) %>% summarise(diabetes = mean(diabetes == 1)) %>% 
+        filter(gender == "male") 
+```
+
+Filtering by gender, we can find more women with Diabetes (0.524) than men (0.361). 
+
+3.2.4 Levels of Creatinine phosphokinase 
+
+Creatinine phosphokinase, also know as Creatine Kinase (CK), is an enzyme found in our body. It is located mainly in the heart, brain, and skeletal muscle. When your body has damage, CK increase into your body, meaning something is not right. Also, CK levels are important MI markers.  Elevated levels of CK have used to diagnose a case of MI (Patel R, 2021). 
+
+```{r}
+myocard %>% ggplot(aes(gender, creatinine_phosphokinase)) + geom_point(aes(color = gender)) + 
+        ylab("Levels of Creatinine phosphokinase mg/kg") + xlab("Gender") + 
+        ggtitle("Creatinine phosphokinase")
+```
+
+We can notice that's men have a little higher levels of CK rather than women.  
+
+
+```{r}
+myocard %>% ggplot(aes(age, creatinine_phosphokinase)) + geom_point(aes(color = gender)) + 
+        ylab("Levels of Creatinine phosphokinase mg/kg") + xlab("Age") + 
+        ggtitle("Creatinine phosphokinase by Age and Gender")
+```
+
+As sawn before, age can be risk factors for some disease. We can analyse the CK by age and gender. Following this, what're the mean levels between women and men? 
+```{r}
+ myocard %>% group_by(gender) %>% summarise(creatinine_phosphokinase = mean(creatinine_phosphokinase))
+
+ myocard %>% group_by(gender) %>% summarise(creatinine_phosphokinase = sd(creatinine_phosphokinase))
+```
+According to the literature, the normals levels of CK is around 200 ul/L. We can see the man have mean and standard deviation higher than women. Showing to us the man has higher risk than women. 
+
+3.2.5 Serum Creatinine 
+
+The creatinine levels measure how well your kidneys perform their work of filtering waste from your blood. That's mean if your kidney has an injury or damage, the levels of creatinine can arise. 
+
+```{r}
+myocard %>% ggplot(aes(gender, serum_creatinine)) + geom_point(aes(color = gender)) +
+        ylab("Levels of Serum Creatinine mg/dL") + xlab("Gender") + 
+        ggtitle("Serum Creatinine")
+```
+The levels of Serum creatinine is slightly the same between gender. 
+
+```{r}
+myocard %>% ggplot(aes(age, serum_creatinine)) + geom_point(aes(color = gender, shape = gender)) + 
+        ylab("Levels of Serum Creatinine mg/dL") + xlab("Age") + 
+        ggtitle("Serum Creatinine by Age and Gender")
+
+```
+We can visualise the Serum creatine Age and gender. We can see there are no differences between gender. The levels of Serum creatinine between woman and men are quite the same. We can see this by the mean and standard deviation. 
+
+```{r}
+myocard %>% group_by(gender) %>% summarise(mean(serum_creatinine), sd(serum_creatinine))
+```
+
+
+3.2.6 Serum Sodium Levels 
+
+Alterations in sodium levels is a risk for any disease. High levels of serum sodium can lead to high pressure, but lower levels can predict MI. This graph shows us the Sodium serum levels, and we can notice for both gender is around 137. Normals levels are about 135 to 145 mEq/L. 
+
+```{r}
+myocard %>% ggplot(aes(gender, serum_sodium)) + 
+        geom_boxplot(aes(color = gender), outlier.colour = "blue", width = 0.3) + 
+        ylab("Levels of Serum Sodium mEq/L") + xlab("Gender") + 
+        ggtitle("Serum sodium levels")
+```
+We can see, the levels of serum sodium in both gender in our case doesn't have difference. Also, that can observe by the mean and standard deviation. 
+
+```{r}
+myocard %>% group_by(gender) %>% summarise(mean(serum_sodium), sd(serum_sodium))
+```
+
+
+3.2.7 High Blood Pressure
+
+
+
+High blood pressure is medically known as hypertension. When somebody has high blood pressure, the heart is working too hard to pump the blood for all the body. 
+In our case, the variable high blood pressure is measurable by meaning the number 1 is the patients who have high pressure and 0 who don't have pressure. 
+
+
+```{r}
+myocard %>% ggplot(aes(high_blood_pressure)) + geom_bar(aes(fill = gender)) + 
+        scale_fill_brewer(palette = "Accent") + ylab("Frequency of High Blood Pressure") + 
+        xlab("High Blood Pressure") + ggtitle("Distribution of High Blood Pressure by Gender")
+```
+
+We can see the more patients doesn't have high blood pressure. We can easily see by the code below the proportions of males and females in high blood pressure. 
+
+```{r}
+myocard %>% group_by(gender) %>% summarise(high_blood_pressure = mean(high_blood_pressure == 0)) %>% filter(gender == "male") 
+myocard %>% group_by(gender) %>% summarise(high_blood_pressure = mean(high_blood_pressure == 1)) %>% filter(gender == "male") 
+
+myocard %>% group_by(gender) %>% summarise(high_blood_pressure = mean(high_blood_pressure == 0)) %>% filter(gender == "female") 
+myocard %>% group_by(gender) %>% summarise(high_blood_pressure = mean(high_blood_pressure == 1)) %>% filter(gender == "female") 
+```
+
+We can quickly notice that there are more patients male with high blood pressure than males don't have. 
+
+3.2.8 Distribution of Smoking 
+
+Smoking is the most significant health issue worldwide. Besides that, smoking causes problems breathing and lung cancer. People who smoke are two to four times more likely to get MI. 
+In our case, the variable smoking is measurable by meaning the number 1 is the patients who somking and 0 who don't smoking. 
+
+```{r}
+myocard %>% ggplot(aes(smoking)) + geom_bar(aes(fill = gender)) + 
+        scale_fill_brewer(palette = "Paired") + ylab("Frequency of Smoking by Gender") + 
+        xlab("Smoking") + ggtitle("Distribution of smoking")
+```
+
+And now, what the proportion of woman and men smoking? 
+
+
+```{r}
+myocard %>% group_by(gender) %>% summarise(smoking = mean(smoking == 0)) %>% filter(gender == "male") 
+myocard %>% group_by(gender) %>% summarise(smoking = mean(smoking == 1)) %>% filter(gender == "male") 
+
+
+myocard %>% group_by(gender) %>% summarise(smoking = mean(smoking == 0)) %>% filter(gender == "female") 
+myocard %>% group_by(gender) %>% summarise(smoking = mean(smoking == 1)) %>% filter(gender == "female") 
+```
+
+We can notice the number of women doesn't smoke higher than woman smoking, either comparing with man smoking or not. 
+
+
+3.2.9 Distribution of Time (Hospitalisation)
+
+
+Time of hospitalisation is another risk for MI. Studies have shown the times of hospitalisation associated with comorbidity increase of risk for MI. As sad before, the Time variable is counting how many time the patients has of hospitalisation. 
+```{r}
+myocard %>% ggplot(aes(time, fill = gender)) + 
+        geom_histogram(binwidth = 10, bins = 5, color = "black", alpha = 0.4) +
+        xlim(c(0,300)) +
+        xlab("Time") + ggtitle("Distribution of Hospitalisation")
+```
+
+Observing this histogram graph, we can see the distribution of data by the time is not a normal distribution. We can see a high peak in around 200 times. 
+
+```{r}
+myocard %>% ggplot(aes(time, age)) + geom_point(aes(color = gender)) + ggtitle("Time hospitalisation by Age and gender")
+```
+We can notice in this graph that it's hard to know the distribution, but we can see a man has shown more in the scatterplot, but the number of man in our case is higher than the woman. 
+
+4.0 Linear Regression 
+
+Until now, we have observed the distribution of comorbidity in our case MI. The second part of this project is to build a machine learning model, and a linear regression model is considered a machine learning model. 
+
+Multiple Linear Regression is a technique statistical that use several variables exploratory to predict the outcome of a response variable. We have several variable exploratories (independent variable) and response (in our case, time-variable) outcomes. 
+
+```{r}
+fit <- lm(time ~ age + sex + high_blood_pressure + smoking + creatinine_phosphokinase + serum_creatinine + serum_sodium, data = myocard)
+fit
+summary(fit)
+tidy(fit)
+```
+
+4.1 Linear Regression and Results
+
+
+The overall quality of the multiple linear regression can be assessing following three quantify display in summary function. 
+
+Residual Standard Error (RSE): this represents the average of the outcomes and the predicted values by the model. Which lowest RSE, is better for fit the model in our data. We can notice we have 74.41 RSE in our project results, and meaning is a high value for RSE.
+Multiple R-square and Adjust R-square: the multiple correlations between three or more variables. It tells us how useful the predictor variables are at predicting the value of the response variable. In our case, we can see the Multiple R-square is 0.1025. It is a good result however, it doesn't mean it is a good fit. 
+ Adjust R-square: This is a correction for the number of x variables included in the predictive model. Adjust R-square near to 1 indicates that the regression model has explained a large proportion of the variability in the outcome. In our case is around 0.080.
+F-statistical: It's the overall significance of the model. It assesses whether at least one predictor variable has a non-zero coefficient.  In statistical p-value significant is <= 0.05, our case show 4.572e-05 for p-value, showing us very strong p-value. 
+
+What the intercept of the model? 
+
+```{r}
+fit$coef[1]
+```
+
+Looking back at the display of the summary function, we can see the age and high_blood_pressure has to asterisk. We can see the strong p-value between time and these two variables. However, we can see the plot doesn't show strong relation when we plot the linear regression model. 
+
+4.1.2 Predict age by time 
+
+```{r}
+time_vs_age_hbp <- lm(time ~ age + high_blood_pressure, data = myocard)
+time_vs_age_hbp
+tidy(time_vs_age_hbp)
+summary(time_vs_age_hbp)
+
+myocard %>% ggplot(aes(time, age)) + geom_point(aes(color = gender, shape = factor(high_blood_pressure))) + geom_smooth(method = "lm") + xlab("Time") + ylab("Age") + ggtitle("Linear regression")
+```
+
+We can see for each increase at the variable age, the time decrease -1.35 and high_blood_pressure -28.7. 
+
+4.1.3 Conclusion 
+
+
+Until now, we made a multiple linear regression, trying to find out if the comorbidity or health issue predicts the time in hospitals in patients MI.  In our results, we found a significant relationship between age and high_blood_pressure with time. Specially we found for each new data add in age the time decrease -1.354 and each new data in high_blood_pressure decrease time in -28.744. 
+
+5.0 Machine Learning 
+
+
+
+The large of information in data healthcare have increasingly risen in the last decade. Understanding and quantify extensive healthcare data can lead to the expected risk and predict disease in patients. Machine learning is the study of tools and methods for identifying data patterns (Wienns J, 2017). Understanding these methods can be used to predict the risk for disease and predict the future.  This project uses two parameters in machine learning, LDA (Linear Discriminant Analysis) and QDA (Quadratic Discriminant Analysis). 
+
+
+5.1 Linear Discriminant Analysis - LDA 
+
+
+Linear discriminant analysis is used as a tool for classification, dimension reduction, and data visualisation. Also is a linear machine learning algorithm used for multi-class classification. LDA seeks to best separate (or discriminate) the samples in the training dataset by their class value. For this, we are classifying the data by the median in the time. We are using the mean value on time and considering this "high" or "low" for hospitalisation time. Value is separated into "high"  for risk to MI and "low" risk to MI. At this part of the project, we are going to use all the variables in it. For this step, we are split the myocard data set into train and test. The train data set has 10%, and the test has 90% of the original data. Also, it is an important method that evaluates the accuracy of the dataset.
+
+Until now, we create the gender variable for better visualisation of data. However, for doing a machine learning algorithm, we are going to exclude this variable. 
+
+```{r}
+myocard <- subset(myocard, select = -14)
+```
+
+```{r}
+mean(myocard$time)
+```
+
+```{r}
+myocard <- myocard %>% mutate(time = ifelse(time > 130, "high", "low"))
+
+myocard$time <- factor(myocard$time, levels = c("high", "low"))
+```
+
+```{r}
+set.seed(1)
+test_index <- createDataPartition(myocard$time, times = 1, p = 0.1, list = FALSE)
+train_set <- myocard[-test_index, ]
+test_set <- myocard[test_index, ]
+
+lda_fit <- train(time ~., method = "lda", data = train_set)
+lda_predict <- predict(lda_fit, test_set)
+confusionMatrix(lda_predict, test_set$time)
+```
+
+When we look at our results on sensitivity and specificity parameters, we also conclude that on our model LDA: the sensitivity 0.6429 means 64% of patients have the risk for MI and fails in 36%. While specificity 0.5882 means 58% doesn't have relations with time and fails 42% and an Accuracy of 0.6129. 
+
+5.2 Quadratic Discriminant Analysis - QDA 
+
+QDA is a variant of LDA in which an individual covariance matrix is estimated for every class of observations. Discriminant analysis is used to determine which variables discriminate between two or more naturally occurring groups. 
+
+```{r}
+qda_fit <- train(time ~., method = "qda", data = train_set)
+qda_predict <- predict(qda_fit, test_set)
+confusionMatrix(qda_predict, test_set$time)
+```
+
+In our case, when we look at our results on sensitivity and specificity parameters, we also conclude that on our model QDA: the sensitivity 0.5714 means 57% of patients have the risk for MI and fails in 43%. While specificity 0.3529 means 35% doesn't have relations with time and fails 65% and an Accuracy of 0.4516. 
+
+
+Accuracy is a parameter that generally describes how the model performs across the data. It's a relation between the number of correct prediction to the total prediction on test data. For example, in our data, we can find the better Accuracy on the LDA model is 0.6129. This algorithm has 61% classifying patients low or high time in hospitalisation. 
+
+
+6.0 Conclusion 
+
+Our project tried whether the patient's time in the hospital is at risk for myocardial infarction. For this, we performed a linear regression analysis in the first part, verifying the relationship between the variables. In this part, we saw that age and time are related. In the second part, we set up a machine learning LDA and QDA model. We were checking the specificity and sensitivity of the model. We can conclude that our model can predict with an accuracy of around 60% that the time of the hospitalized patient added to the other comorbidities increases the risk of MI.
+
+7.0 References 
+
+
+Zumel Nina, Mount Jhon: Practical Data Science with R. ed; Manning, 2019. book
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4804079/
+https://www.sciencedirect.com/science/article/abs/pii/S0009912018311974?via%3Dihub
+https://ascpt.onlinelibrary.wiley.com/doi/10.1002/cpt.1803
+https://www.sciencedirect.com/science/article/pii/S0960982212008159
+https://www.ncbi.nlm.nih.gov/books/NBK546624/
+
+
